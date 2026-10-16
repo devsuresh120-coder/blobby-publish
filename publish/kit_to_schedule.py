@@ -1,4 +1,4 @@
-"""Turn Merge Conflict post-kit markdown files into queue/schedule.csv rows.
+"""Turn Blobby & Co. post-kit markdown files into queue/schedule.csv rows.
 
   python3 publish/kit_to_schedule.py --kits kit1.md kit2.md --episodes 2 3 4 8 --out queue/schedule.csv [--append]
       [--skip 1:youtube]        # episode:platform pairs already posted by hand
@@ -18,8 +18,8 @@ import re, csv, argparse, os
 
 SLOTS = {"youtube": ("08:00", "18:00"), "tiktok": ("12:00", "19:30"), "facebook": ("08:30", "19:00")}  # Europe/Berlin
 
-BASE_TAGS = "#programming #coding #programmerhumor #devlife #softwareengineer #codinglife #programmingmemes"
-FOOT = "\\nMerge Conflict — Episode {n}. New episode every day."
+BASE_TAGS = "#blobbyandco #relatable #meme #funny #animation #comedy #cartoon"
+FOOT = "\\nBlobby & Co. — Episode {n}. New episode every day."
 
 def parse(text):
     eps = {}
