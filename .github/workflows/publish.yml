@@ -1,0 +1,59 @@
+name: Publish to Buffer
+
+on:
+  push:
+    branches: [main]
+    paths: ["queue/schedule.csv", "videos/**", "publish/**"]
+  schedule:
+    - cron: "41 4 * * *"   # daily 04:17 UTC: top up Buffer queues (free plan: 10 per channel)
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "publish | list-channels | dry-run"
+        default: "publish"
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests boto3
+
+      - name: List Buffer channels
+        if: github.event.inputs.action == 'list-channels'
+        env:
+          BUFFER_ACCESS_TOKEN: ${{ secrets.BUFFER_ACCESS_TOKEN }}
+        run: python publish/list_channels.py
+
+      - name: Publish queue
+        if: github.event.inputs.action != 'list-channels'
+        env:
+          BUFFER_ACCESS_TOKEN: ${{ secrets.BUFFER_ACCESS_TOKEN }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          R2_PREFIX: blobby/
+          DRY_RUN: ${{ github.event.inputs.action == 'dry-run' && '1' || '' }}
+        run: python publish/publish.py
+
+      - name: Save posted.json
+        if: always() && github.event.inputs.action != 'list-channels'
+        run: |
+          git config user.name "blobby-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add queue/posted.json
+          if git diff --cached --quiet; then echo "nothing new to record"; else
+            git commit -m "record posted episodes [skip ci]" && git pull --rebase && git push
+          fi
