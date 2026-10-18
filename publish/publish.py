@@ -102,9 +102,9 @@ def build_input(row, channel_id, video_url):
     if p == "youtube":
         inp["metadata"] = {"youtube": {"title": row["title"].strip()[:100], "categoryId": YT_CATEGORY_COMEDY,
                                        "privacy": "public", "madeForKids": False, "notifySubscribers": True,
-                                       "isAiGenerated": True}}
+                                       "isAiGenerated": False}}
     elif p == "tiktok":
-        inp["metadata"] = {"tiktok": {"isAiGenerated": True}}
+        inp["metadata"] = {"tiktok": {"isAiGenerated": False}}
     elif p == "facebook":
         fb = {"type": "reel"}
         # firstComment needs a paid Buffer plan; send it only when FIRST_COMMENT=1
