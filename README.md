@@ -29,3 +29,6 @@ publish/list_channels.py     prints the Buffer channels the token can see
 1. Copy `epNN.mp4` into `videos/`, the kit into `kits/`.
 2. `python3 publish/kit_to_schedule.py --kits kits/epA-B_post_kits.md --episodes A … B --start YYYY-MM-DD --append` (add `--skip tiktok` until TikTok is connected).
 3. Commit and push to `main`.
+
+## TikTok (manual, since Oct 19 2026)
+TikTok mutes Blobby's audio when posted through the API (Buffer) but accepts the same files uploaded in the app or TikTok Studio. So TikTok rows are NOT generated (`kit_to_schedule.py --skip tiktok`); each batch ships a `tiktok_manual/` kit (captions + suggested times) and the owner schedules the videos on tiktok.com/tiktokstudio (up to 10 days ahead).
