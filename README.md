@@ -32,3 +32,9 @@ publish/list_channels.py     prints the Buffer channels the token can see
 
 ## TikTok (manual, since Oct 19 2026)
 TikTok mutes Blobby's audio when posted through the API (Buffer) but accepts the same files uploaded in the app or TikTok Studio. So TikTok rows are NOT generated (`kit_to_schedule.py --skip tiktok`); each batch ships a `tiktok_manual/` kit (captions + suggested times) and the owner schedules the videos on tiktok.com/tiktokstudio (up to 10 days ahead).
+
+**In the social-hub dashboard (since Oct 23 2026):** `queue/tiktok_manual.csv` holds one TikTok row per episode
+(Sri Lanka time, 15:30 / 23:00 on the same day as the YouTube row; caption = the kit's **TikTok:** line, comment = **Pinned comment:**),
+and `queue/tiktok_posted.json` records what the owner marked as posted. `publish.py` and the workflow never read these
+two files, so nothing goes to Buffer. After adding a batch: `python3 tiktok_manual/make_rows.py` (adds rows for new episodes; keeps edited rows).
+
