@@ -63,7 +63,7 @@ BC_FORMAT (since ep 33, hard rules):
 
 12-13 s, seamless loop (last beat = "Next day:" bridge back to beat 1), loop=True, voice=False
 no end card, no on-screen question, no voice line; the question goes only in description / pinned comment
-frame one = action + sound, first caption 1-3 words, punchline by ~8 s
+frame one = action + sound, first caption = the premise as a 4-7 word statement (not a 1-3 word label; changed 2026-10-25), punchline by ~8 s
 max 2 short non-verbal human reaction sounds (vox) per video, never words
 TikTok is manual (no TikTok rows in Buffer); each batch also gives a tiktok_manual zip
 reference batch: code/ep33_42.py in blobby_pack.zip
