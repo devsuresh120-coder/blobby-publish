@@ -280,5 +280,29 @@
   "due_at": "2026-10-29T18:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep16_v3.mp4",
   "at": "2026-10-24T05:06:06+00:00"
+ },
+ "17:youtube": {
+  "post_id": "6add8ed43d5b27036bb8fefb",
+  "due_at": "2026-10-30T07:00:00.000Z",
+  "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep17_v3.mp4",
+  "at": "2026-10-25T05:08:36+00:00"
+ },
+ "17:facebook": {
+  "post_id": "6add8ed98b3d437ddcf1237e",
+  "due_at": "2026-10-30T07:30:00.000Z",
+  "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep17_v3.mp4",
+  "at": "2026-10-25T05:08:41+00:00"
+ },
+ "18:youtube": {
+  "post_id": "6add8ee0e4be8a4d86909d31",
+  "due_at": "2026-10-30T17:00:00.000Z",
+  "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep18_v3.mp4",
+  "at": "2026-10-25T05:08:48+00:00"
+ },
+ "18:facebook": {
+  "post_id": "6add8ee56887a2efc1ec61f7",
+  "due_at": "2026-10-30T18:00:00.000Z",
+  "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep18_v3.mp4",
+  "at": "2026-10-25T05:08:53+00:00"
  }
 }
