@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .env
 secrets.env
+studio/voices/*.onnx
+studio/voices/*.json
+studio/episodes/

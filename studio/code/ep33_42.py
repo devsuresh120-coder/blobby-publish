@@ -1,0 +1,321 @@
+"""Blobby & Co. — episodes 33-42 ("fast hook + seamless loop" batch).
+Rules from analytics (ep1 58% stayed / 111% viewed vs ep2 27%):
+- action + sound in the very first frame, first caption 1-3 words
+- 12-13 s, NO end card, NO question on screen, NO voice line (loop=True)
+- last beat is a "bridge" that looks like beat 1, so the video flows straight back to the start
+- short human reaction sounds (vox): "Ah!", "Mm-hm.", "Oh no!", "Ugh!" ... never words/sentences
+Run: python3 ep33_42.py [nums...]
+"""
+import sys
+from engine import render
+
+B, P, BO, M = "blobby", "pinky", "boss", "meow"
+L = dict(loop=True, voice=False)
+
+EP33 = dict(num=33, slug="cooking-video", stage="kitchen", cover=6.1, **L,
+    beats=[
+        dict(dur=1.0, caption="Chef mode", shake=4,
+             chars={B: dict(at=(420, 1120), eyes="wide", mouth="grin", arms="up", fx="sparkle")},
+             sfx=[("tada", 0.0)], vox=[(B, "Yay!", 0.15, 0.8, 0.5)]),
+        dict(dur=1.8, caption="Chef mode", bubble=(B, "Easy recipe"),
+             chars={B: dict(at=(470, 1120), eyes="happy", mouth="grin", arms="hold", prop="phone")},
+             sfx=[("pop", 0.1)], vox=[(B, "Mm-hm.", 0.5, 0.8)]),
+        dict(dur=1.4, caption="Chef mode",
+             chars={B: dict(at=(470, 1120), eyes="happy", mouth="smile", arms="hold", fx="music")},
+             sfx=[("whoosh", 0.3)]),
+        dict(dur=1.3, caption="Chef mode",
+             chars={B: dict(at=(480, 1110), angle=8, eyes="wide", mouth="o", arms="flail", fx="sweat")},
+             sfx=[("whoosh", 0.0), ("whoosh", 0.6)], vox=[(B, "Oh no!", 0.2, 0.9, 0.6)]),
+        dict(dur=0.4, shake=16,
+             chars={B: dict(at=(380, 1140), angle=-20, squash=0.7, eyes="spiral", mouth="wavy", arms="flail", fx="impact", tween=False)},
+             sfx=[("explosion", 0.0)]),
+        dict(dur=2.6, caption="Recipe: 10 min\nMe: 1 fire",
+             chars={B: dict(at=(380, 1140), angle=-20, squash=0.7, eyes="spiral", mouth="wavy", fx="stars", tween=False)},
+             sfx=[("crickets", 0.6)], vox=[(B, "Ugh!", 0.3, 0.8, 0.6)]),
+        dict(dur=2.4, caption="Dinner:\ndelivered",
+             chars={B: dict(at=(520, 1120), eyes="happy", mouth="grin", arms="hold", prop="pizza", fx="sweat", tween=False)},
+             sfx=[("door", 0.0), ("ding", 0.4)], vox=[(B, "Mm-hm.", 1.0, 0.8)]),
+        dict(dur=1.2, caption="Tomorrow:",
+             chars={B: dict(at=(440, 1120), eyes="open", mouth="flat", arms="flex", brows=True)},
+             sfx=[("whoosh", 0.8)], vox=[(B, "Hah!", 0.3, 0.8, 0.4)]),
+    ])
+
+EP34 = dict(num=34, slug="blanket-war", stage="bedroom", cover=7.4, **L,
+    beats=[
+        dict(dur=0.9, stage=dict(night=True, clock="2:00"), caption="2:00 AM", shake=8, overlay="blanket",
+             chars={B: dict(at=(150, 1000), angle=20, scale=0.85, eyes="wide", mouth="o", fx="exclaim"),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile")},
+             sfx=[("whoosh", 0.0)], vox=[(B, "Huh?", 0.25, 0.9, 0.45)]),
+        dict(dur=1.6, stage=dict(night=True, clock="2:00"), caption="2:00 AM\nno blanket", overlay="blanket", shake=3,
+             chars={B: dict(at=(150, 1000), angle=20, scale=0.85, eyes="wide", mouth="wavy", fx="sweat"),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile", fx="zzz")},
+             sfx=[("snore", 0.6)], vox=[(B, "Brrr.", 0.1, 0.7)]),
+        dict(dur=1.5, stage=dict(night=True, clock="2:01"), caption="Pull...", overlay="blanket",
+             chars={B: dict(at=(130, 980), angle=10, scale=0.85, eyes="open", mouth="flat", arms="hold", brows=True),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile", fx="zzz")},
+             sfx=[("squeak", 0.3)], vox=[(B, "Mmm!", 0.2, 0.7, 0.6)]),
+        dict(dur=1.5, stage=dict(night=True, clock="2:01"), caption="PULL!", overlay="blanket", shake=4,
+             chars={B: dict(at=(120, 970), angle=0, scale=0.85, eyes="angry", mouth="grin", arms="flail", fx="sweat"),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="half", mouth="flat")},
+             sfx=[("squeak", 0.0), ("squeak", 0.6)], vox=[(B, "Hnnngh!", 0.1, 0.8, 0.8), (P, "Hmph.", 1.0, 0.7)]),
+        dict(dur=0.4, stage=dict(night=True, clock="2:01"), overlay="blanket", shake=14,
+             chars={B: dict(at=(140, 1300), angle=90, scale=0.85, squash=0.7, eyes="spiral", mouth="wavy", arms="flail", fx="impact", tween=False),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile")},
+             sfx=[("whoosh", 0.0), ("thud", 0.15)]),
+        dict(dur=3.2, stage=dict(night=True, clock="2:02"), caption="Shared blanket:\n100% hers", overlay="blanket",
+             chars={B: dict(at=(140, 1300), angle=90, scale=0.85, squash=0.7, eyes="half", mouth="sad", fx="sweat", tween=False),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile", fx="zzz")},
+             sfx=[("crickets", 0.0), ("snore", 1.2)], vox=[(B, "Ugh.", 0.4, 0.7, 0.6), (P, "Mm-hm.", 2.0, 0.6)]),
+        dict(dur=1.4, stage=dict(night=True, clock="1:59"), caption="Next night:", overlay="blanket",
+             chars={B: dict(at=(150, 1000), angle=20, scale=0.85, eyes="closed", mouth="smile", fx="zzz", tween=False),
+                    P: dict(at=(470, 1050), angle=-30, scale=0.85, eyes="closed", mouth="smile")},
+             sfx=[("snore", 0.3)]),
+    ])
+
+EP35 = dict(num=35, slug="quick-call", stage="office", cover=6.6, **L,
+    beats=[
+        dict(dur=0.9, stage=dict(screen="zoom", clock="9:00"), caption="\"Quick call\"", shake=5,
+             chars={B: dict(at=(250, 1120), eyes="wide", mouth="o", fx="exclaim"),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="flat", arms="point")},
+             sfx=[("ding", 0.0)], vox=[(BO, "Ahem.", 0.2, 0.9)]),
+        dict(dur=1.6, stage=dict(screen="zoom", clock="9:00"), bubble=(BO, "5 minutes"),
+             chars={B: dict(at=(250, 1120), eyes="open", mouth="smile"),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="flat", arms="wave")},
+             sfx=[("pop", 0.0)], vox=[(B, "Mm-hm.", 0.6, 0.8)]),
+        dict(dur=1.5, stage=dict(screen="zoom", clock="10:30"), caption="10:30",
+             chars={B: dict(at=(250, 1120), eyes="half", mouth="flat"),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="o", arms="wave", prop="paper")},
+             sfx=[("tick_tock", 0.0)], vox=[(BO, "Hmm.", 0.5, 0.8, 0.6)]),
+        dict(dur=1.5, stage=dict(screen="chart", clock="1:15"), caption="1:15",
+             chars={B: dict(at=(250, 1150), squash=0.8, eyes="spiral", mouth="wavy", fx="sweat"),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="o", arms="point", prop="paper")},
+             sfx=[("tick_tock", 0.0)], vox=[(B, "Haaa...", 0.4, 0.8, 0.9)]),
+        dict(dur=0.6, stage=dict(screen="chart", clock="4:55"), shake=6,
+             chars={B: dict(at=(250, 1200), squash=0.5, eyes="closed", mouth="wavy", tween=False),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="o", arms="wave")},
+             sfx=[("slide_whistle_down", 0.0)]),
+        dict(dur=3.0, stage=dict(screen="zoom", clock="5:00"), caption="\"Quick call\":\n8 hours",
+             chars={B: dict(at=(250, 1200), squash=0.5, eyes="closed", mouth="wavy", fx="zzz", tween=False),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="smile", arms="cross")},
+             sfx=[("sad_trombone", 0.0)], vox=[(BO, "Mm-hm.", 1.6, 0.7)]),
+        dict(dur=1.4, stage=dict(screen="zoom", clock="8:59"), caption="Next day:",
+             chars={B: dict(at=(250, 1120), eyes="open", mouth="smile", tween=False),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="flat", arms="down")},
+             sfx=[("steps", 0.4)]),
+    ])
+
+EP36 = dict(num=36, slug="saving-money", stage="living", cover=5.9, **L,
+    beats=[
+        dict(dur=0.9, stage=dict(tv="off"), caption="No-spend month", shake=4,
+             chars={B: dict(at=(560, 1150), eyes="open", mouth="grin", arms="flex", brows=True, prop="money", fx="sparkle")},
+             sfx=[("cash", 0.0)], vox=[(B, "Hah!", 0.2, 0.8, 0.4)]),
+        dict(dur=1.6, stage=dict(tv="off"), caption="Day 1",
+             chars={B: dict(at=(600, 1150), eyes="happy", mouth="grin", arms="flex", prop="money", fx="sparkle")},
+             sfx=[("sparkle", 0.2)], vox=[(B, "Mm-hm!", 0.6, 0.8)]),
+        dict(dur=1.4, stage=dict(tv="off"), caption="Day 1", bubble=(B, "SALE -70%"),
+             chars={B: dict(at=(600, 1150), eyes="wide", mouth="o", arms="hold", prop="phone", fx="exclaim", tween=False)},
+             sfx=[("ding", 0.0)], vox=[(B, "Ooh!", 0.3, 0.9, 0.6)]),
+        dict(dur=1.6, stage=dict(tv="off"), caption="Day 1",
+             chars={B: dict(at=(600, 1150), eyes="hearts", mouth="grin", arms="hold", prop="phone", fx="hearts")},
+             sfx=[("heartbeat", 0.0), ("type_keys", 0.8)], vox=[(B, "Mmmm...", 0.1, 0.7, 0.8)]),
+        dict(dur=0.8, stage=dict(tv="off"), caption="Day 2", shake=6,
+             chars={B: dict(at=(600, 1150), eyes="wide", mouth="grin", arms="hold", prop="gift", tween=False)},
+             sfx=[("door", 0.0), ("boing", 0.2)]),
+        dict(dur=3.2, stage=dict(tv="off"), caption="No-spend month:\nlasted 1 day",
+             chars={B: dict(at=(600, 1150), eyes="happy", mouth="grin", arms="hold", prop="gift", fx="sweat", tween=False)},
+             sfx=[("sad_trombone", 0.2)], vox=[(B, "Heh heh.", 1.6, 0.7)]),
+        dict(dur=1.3, stage=dict(tv="off"), caption="Next month:",
+             chars={B: dict(at=(560, 1150), eyes="open", mouth="flat", arms="flex", brows=True, prop="money", tween=False)},
+             sfx=[("whoosh", 0.9)]),
+    ])
+
+EP37 = dict(num=37, slug="5am-cat-alarm", stage="bedroom", cover=0.4, **L,
+    beats=[
+        dict(dur=0.9, stage=dict(night=True, clock="5:00"), caption="5:00 AM", overlay="blanket", shake=10,
+             chars={B: dict(at=(230, 1030), angle=35, scale=0.9, eyes="wide", mouth="o", fx="exclaim"),
+                    M: dict(at=(330, 900), pose="pounce", eyes="wide", mouth="o")},
+             sfx=[("meow", 0.0), ("boing", 0.1)], vox=[(B, "Ah!", 0.2, 0.9, 0.5)]),
+        dict(dur=1.7, stage=dict(night=True, clock="5:00"), caption="5:00 AM", overlay="blanket",
+             chars={B: dict(at=(230, 1030), angle=35, scale=0.9, eyes="closed", mouth="flat"),
+                    M: dict(at=(560, 1080), pose="sit", eyes="wide", mouth="o", tween=False)},
+             sfx=[("meow", 0.1), ("meow", 0.9)], vox=[(B, "Mmm-mm.", 1.2, 0.7)]),
+        dict(dur=1.7, stage=dict(night=True, clock="5:01"), caption="Snooze?", overlay="blanket",
+             chars={B: dict(at=(230, 1030), angle=35, scale=0.9, eyes="half", mouth="flat", fx="sweat"),
+                    M: dict(at=(210, 860), pose="sit", eyes="open", mouth="smile", tween=False)},
+             sfx=[("thud", 0.0), ("meow", 0.7)], vox=[(B, "Ugh!", 0.3, 0.8, 0.5)]),
+        dict(dur=1.6, stage=dict(night=True, clock="5:02"), overlay="blanket_back",
+             chars={B: dict(at=(520, 1120), eyes="half", mouth="flat", legs="step", tween=False),
+                    M: dict(at=(820, 1180), pose="sit", eyes="happy", mouth="smile", tween=False)},
+             sfx=[("yawn", 0.0), ("steps", 0.8)], vox=[(B, "Haaa...", 0.1, 0.7, 0.9)]),
+        dict(dur=3.2, stage=dict(night=True, clock="5:03"), caption="Cat alarm:\nno snooze button", overlay="blanket_back",
+             chars={B: dict(at=(520, 1120), eyes="half", mouth="sad", fx="zzz"),
+                    M: dict(at=(820, 1180), pose="sit", eyes="happy", mouth="smile", fx="hearts")},
+             sfx=[("purr", 0.0), ("crickets", 1.4)]),
+        dict(dur=1.6, stage=dict(night=True, clock="4:59"), caption="Next day:", overlay="blanket",
+             chars={B: dict(at=(230, 1030), angle=35, scale=0.9, eyes="closed", mouth="smile", fx="zzz", tween=False),
+                    M: dict(at=(560, 1080), pose="sit", eyes="half", mouth="smile", tween=False)},
+             sfx=[("snore", 0.2)]),
+    ])
+
+EP38 = dict(num=38, slug="photo-of-me", stage="street", cover=5.6, **L,
+    beats=[
+        dict(dur=1.0, caption="\"Take a photo\"", shake=4,
+             chars={P: dict(at=(300, 1120), eyes="happy", mouth="smile", arms="wave", fx="sparkle"),
+                    B: dict(at=(780, 1120), eyes="wide", mouth="o", arms="hold", prop="phone")},
+             sfx=[("whoosh", 0.0), ("pop", 0.5)], vox=[(P, "Mm-hm!", 0.2, 0.8)]),
+        dict(dur=1.6, caption="Photo 1",
+             chars={P: dict(at=(300, 1120), eyes="happy", mouth="smile", arms="up"),
+                    B: dict(at=(780, 1120), eyes="open", mouth="smile", arms="hold", prop="phone")},
+             sfx=[("pop", 0.1)], vox=[(B, "Mm-hm!", 0.6, 0.7)]),
+        dict(dur=1.5, caption="Photo 30",
+             chars={P: dict(at=(300, 1120), eyes="half", mouth="flat", arms="cross"),
+                    B: dict(at=(760, 1140), angle=-10, eyes="open", mouth="flat", arms="hold", prop="phone", fx="sweat")},
+             sfx=[("pop", 0.0), ("pop", 0.25), ("pop", 0.5), ("pop", 0.75)], vox=[(P, "Hmm.", 1.0, 0.7, 0.5)]),
+        dict(dur=1.5, caption="Photo 87",
+             chars={P: dict(at=(300, 1120), eyes="angry", mouth="flat", arms="cross", fx="anger"),
+                    B: dict(at=(740, 1180), angle=-25, eyes="wide", mouth="wavy", arms="hold", prop="phone", fx="sweat")},
+             sfx=[("pop", 0.0), ("pop", 0.15), ("pop", 0.3), ("pop", 0.45), ("record_scratch", 0.9)], vox=[(P, "Hmph!", 0.5, 0.8)]),
+        dict(dur=3.4, caption="87 photos.\nAll wrong.",
+             chars={P: dict(at=(300, 1120), eyes="angry", mouth="flat", arms="cross", fx="anger"),
+                    B: dict(at=(760, 1180), squash=0.7, eyes="spiral", mouth="wavy", prop="phone", fx="stars", tween=False)},
+             sfx=[("sad_trombone", 0.0)], vox=[(B, "Haaa...", 1.4, 0.7, 0.9)]),
+        dict(dur=1.6, caption="One more?",
+             chars={P: dict(at=(300, 1120), eyes="happy", mouth="smile", arms="wave", tween=False),
+                    B: dict(at=(780, 1120), eyes="half", mouth="flat", arms="hold", prop="phone", tween=False)},
+             sfx=[("pop", 0.5)], vox=[(P, "Mm-hm?", 0.3, 0.7)]),
+    ])
+
+EP39 = dict(num=39, slug="public-wifi", stage="street", cover=6.5, **L,
+    beats=[
+        dict(dur=1.0, caption="Free WiFi!", shake=5,
+             chars={B: dict(at=(540, 1120), eyes="wide", mouth="grin", arms="up", fx="sparkle")},
+             sfx=[("tada", 0.0)], vox=[(B, "Ooh!", 0.15, 0.9, 0.5)]),
+        dict(dur=1.6, caption="Loading...",
+             chars={B: dict(at=(540, 1120), eyes="open", mouth="smile", arms="hold", prop="phone")},
+             sfx=[("tick_tock", 0.0)], vox=[(B, "Mm-hm.", 0.7, 0.7)]),
+        dict(dur=1.6, caption="Loading...",
+             chars={B: dict(at=(380, 1120), eyes="half", mouth="flat", arms="hold", prop="phone", legs="step", fx="sweat")},
+             sfx=[("steps", 0.0), ("tick_tock", 0.6)], vox=[(B, "Hmm?", 0.9, 0.7, 0.5)]),
+        dict(dur=1.6, caption="Loading...",
+             chars={B: dict(at=(700, 1090), angle=10, eyes="wide", mouth="wavy", arms="up", prop="phone", fx="sweat")},
+             sfx=[("squeak", 0.0), ("tick_tock", 0.5)], vox=[(B, "Hnnngh!", 0.2, 0.8, 0.8)]),
+        dict(dur=0.4, shake=10,
+             chars={B: dict(at=(600, 1200), angle=90, squash=0.7, eyes="spiral", mouth="wavy", arms="flail", fx="impact", tween=False)},
+             sfx=[("thud", 0.0)]),
+        dict(dur=3.2, caption="Free WiFi =\nfree waiting",
+             chars={B: dict(at=(600, 1200), angle=90, squash=0.7, eyes="half", mouth="sad", prop="phone", fx="stars", tween=False)},
+             sfx=[("sad_trombone", 0.0)], vox=[(B, "Ugh.", 1.5, 0.7, 0.6)]),
+        dict(dur=1.4, caption="New café:",
+             chars={B: dict(at=(520, 1120), eyes="open", mouth="smile", arms="down", tween=False)},
+             sfx=[("door", 0.2)]),
+    ])
+
+EP40 = dict(num=40, slug="boss-good-job", stage="office", cover=2.2, **L,
+    beats=[
+        dict(dur=0.9, stage=dict(screen="chart", clock="3:00"), caption="\"Good job!\"", shake=4,
+             chars={B: dict(at=(250, 1120), eyes="wide", mouth="o", fx="exclaim"),
+                    BO: dict(at=(850, 1120), eyes="happy", mouth="smile", arms="wave")},
+             sfx=[("tada", 0.0)], vox=[(BO, "Mm-hm!", 0.2, 0.8)]),
+        dict(dur=1.9, stage=dict(screen="chart", clock="3:00"), caption="\"Good job!\"",
+             chars={B: dict(at=(260, 1110), eyes="hearts", mouth="grin", arms="flex", fx="hearts"),
+                    BO: dict(at=(850, 1120), eyes="happy", mouth="smile", arms="wave")},
+             sfx=[("sparkle", 0.1)], vox=[(B, "Aww!", 0.3, 0.8, 0.7)]),
+        dict(dur=1.0, stage=dict(screen="chart", clock="3:01"), caption="Reward:",
+             chars={B: dict(at=(260, 1120), eyes="open", mouth="o", arms="hold", prop="paper", tween=False),
+                    BO: dict(at=(700, 1120), eyes="half", mouth="smile", arms="hold", prop="paper")},
+             sfx=[("thud", 0.0)], vox=[(B, "Huh?", 0.3, 0.8, 0.4)]),
+        dict(dur=1.0, stage=dict(screen="chart", clock="3:01"), caption="Reward:", shake=4,
+             chars={B: dict(at=(260, 1140), squash=0.85, eyes="wide", mouth="o", arms="hold", prop="paper", fx="sweat"),
+                    BO: dict(at=(700, 1120), eyes="half", mouth="smile", arms="hold", prop="paper")},
+             sfx=[("thud", 0.0)], vox=[(B, "Oh.", 0.3, 0.7, 0.4)]),
+        dict(dur=1.0, stage=dict(screen="chart", clock="3:02"), caption="Reward:", shake=8,
+             chars={B: dict(at=(260, 1170), squash=0.7, eyes="wide", mouth="wavy", arms="hold", prop="paper", fx="sweat"),
+                    BO: dict(at=(700, 1120), eyes="half", mouth="smile", arms="hold", prop="paper")},
+             sfx=[("thud", 0.0)], vox=[(B, "Oh no.", 0.3, 0.8, 0.6)]),
+        dict(dur=3.2, stage=dict(screen="chart", clock="3:02"), caption="Good work =\nmore work",
+             chars={B: dict(at=(260, 1200), squash=0.55, eyes="spiral", mouth="wavy", prop="paper", fx="stars", tween=False),
+                    BO: dict(at=(850, 1120), eyes="half", mouth="flat", arms="cross")},
+             sfx=[("sad_trombone", 0.0)], vox=[(B, "Haaa...", 1.5, 0.7, 0.9)]),
+        dict(dur=1.4, stage=dict(screen="chart", clock="2:59"), caption="Next day:",
+             chars={B: dict(at=(250, 1120), eyes="open", mouth="smile", tween=False),
+                    BO: dict(at=(850, 1120), eyes="happy", mouth="smile", arms="down", tween=False)},
+             sfx=[("steps", 0.3)]),
+    ])
+
+EP41 = dict(num=41, slug="gift-socks", stage="living", cover=5.2, **L,
+    beats=[
+        dict(dur=1.0, stage=dict(tv="off"), caption="Surprise!", shake=4,
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile", arms="hold", prop="gift"),
+                    B: dict(at=(760, 1150), eyes="wide", mouth="o", fx="exclaim")},
+             sfx=[("tada", 0.0)], vox=[(B, "Ooh!", 0.2, 0.9, 0.6)]),
+        dict(dur=1.8, stage=dict(tv="off"), caption="Big box!",
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile"),
+                    B: dict(at=(700, 1150), eyes="hearts", mouth="grin", arms="hold", prop="gift", fx="sparkle")},
+             sfx=[("sparkle", 0.1)], vox=[(B, "Yay!", 0.4, 0.8, 0.6)]),
+        dict(dur=1.6, stage=dict(tv="off"), caption="A new phone??", shake=4,
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile"),
+                    B: dict(at=(700, 1140), angle=10, eyes="wide", mouth="grin", arms="hold", prop="gift")},
+             sfx=[("boing", 0.0), ("boing", 0.6)], vox=[(B, "Hmm? Hmm?", 0.3, 0.7)]),
+        dict(dur=1.0, stage=dict(tv="off"), caption="Socks.",
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile"),
+                    B: dict(at=(700, 1150), angle=0, eyes="wide", mouth="o", arms="down", tween=False)},
+             sfx=[("record_scratch", 0.0)], vox=[(B, "Oh.", 0.4, 0.8, 0.5)]),
+        dict(dur=3.4, stage=dict(tv="off"), caption="Big box.\nSocks.",
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile", fx="hearts"),
+                    B: dict(at=(700, 1150), eyes="half", mouth="grin", arms="wave", fx="sweat")},
+             sfx=[("crickets", 0.0)], vox=[(B, "Heh heh.", 0.8, 0.7), (P, "Aww!", 2.0, 0.7, 0.6)]),
+        dict(dur=1.6, stage=dict(tv="off"), caption="Next birthday:",
+             chars={P: dict(at=(300, 1150), eyes="happy", mouth="smile", arms="hold", prop="gift", tween=False),
+                    B: dict(at=(760, 1150), eyes="half", mouth="flat", tween=False)},
+             sfx=[("steps", 0.3)]),
+    ])
+
+EP42 = dict(num=42, slug="weekend-type", stage="blank", cover=7.6, **L,
+    beats=[
+        dict(dur=1.0, caption="Your weekend?", shake=6,
+             chars={B: dict(at=(540, 1120), eyes="wide", mouth="o", arms="up", fx="question")},
+             sfx=[("boing", 0.0)], vox=[(B, "Hmm?", 0.2, 0.8, 0.5)]),
+        dict(dur=1.6, caption="A) Sofa",
+             chars={B: dict(at=(540, 1160), eyes="half", mouth="smile", legs="sit", prop="remote", tween=False)},
+             sfx=[("pop", 0.0)], vox=[(B, "Mmm...", 0.4, 0.7, 0.7)]),
+        dict(dur=1.6, caption="B) Gym",
+             chars={B: dict(at=(540, 1120), eyes="open", mouth="grin", arms="flex", brows=True, fx="sweat", tween=False)},
+             sfx=[("pop", 0.0), ("boing", 0.6)], vox=[(B, "Hnnngh!", 0.3, 0.8, 0.7)]),
+        dict(dur=1.6, caption="C) Party",
+             chars={B: dict(at=(540, 1100), angle=8, eyes="happy", mouth="grin", arms="up", fx="music", tween=False)},
+             sfx=[("pop", 0.0), ("tada", 0.3)], vox=[(B, "Woo hoo!", 0.5, 0.8)]),
+        dict(dur=1.6, caption="D) Sleep",
+             chars={B: dict(at=(540, 1220), angle=90, eyes="closed", mouth="smile", fx="zzz", tween=False)},
+             sfx=[("pop", 0.0), ("snore", 0.5)]),
+        dict(dur=3.2, caption="Me: D.\nEvery weekend.",
+             chars={B: dict(at=(540, 1220), angle=90, eyes="closed", mouth="smile", fx="zzz", tween=False)},
+             sfx=[("snore", 0.2), ("snore", 1.4), ("crickets", 2.2)], vox=[(B, "Mm-hm.", 0.8, 0.6)]),
+        dict(dur=1.4, caption="Friday again:",
+             chars={B: dict(at=(540, 1120), eyes="open", mouth="o", arms="down", tween=False)},
+             sfx=[("whoosh", 0.9)]),
+    ])
+
+EPISODES = [EP33, EP34, EP35, EP36, EP37, EP38, EP39, EP40, EP41, EP42]
+
+def fit(ep, target=12.3):
+    """Stretch the longer beats so the episode runs ~12 s (ep1 = 13 s held 111%). Quick hits (<= 0.6 s) stay quick."""
+    long_ = [b for b in ep["beats"] if b["dur"] > 0.6]; fixed = sum(b["dur"] for b in ep["beats"] if b["dur"] <= 0.6)
+    k = (target - fixed) / sum(b["dur"] for b in long_)
+    if k > 1:
+        for b in long_: b["dur"] = round(b["dur"]*k, 2)
+for _ep in EPISODES: fit(_ep)
+
+# Max 2 reaction sounds per video (owner: more feels too much). (beat index, sound) to keep:
+VOX_KEEP = {33: {(3, "Oh no!"), (6, "Mm-hm.")}, 34: {(0, "Huh?"), (3, "Hmph.")}, 35: {(0, "Ahem."), (3, "Haaa...")},
+            36: {(2, "Ooh!"), (5, "Heh heh.")}, 37: {(0, "Ah!"), (2, "Ugh!")}, 38: {(3, "Hmph!"), (4, "Haaa...")},
+            39: {(0, "Ooh!"), (5, "Ugh.")}, 40: {(1, "Aww!"), (4, "Oh no.")}, 41: {(0, "Ooh!"), (3, "Oh.")},
+            42: {(3, "Woo hoo!"), (5, "Mm-hm.")}}
+for _ep in EPISODES:
+    for _i, _b in enumerate(_ep["beats"]):
+        _b["vox"] = [v for v in _b.get("vox", []) if (_i, v[1]) in VOX_KEEP[_ep["num"]]]
+    assert sum(len(b["vox"]) for b in _ep["beats"]) == 2, _ep["num"]
+if __name__ == "__main__":
+    only = [int(a) for a in sys.argv[1:]]
+    for ep in EPISODES:
+        if not only or ep["num"] in only:
+            render(ep)
