@@ -120,8 +120,40 @@ CREATE = """mutation($input: CreatePostInput!) {
   }
 }"""
 
+RETRY = set()   # keys re-sent after Buffer reported an error (kept as "retried" so we only retry once)
+
+
+def check_buffer_errors(posted):
+    """Posts Buffer accepted can still fail later (e.g. a YouTube upload timeout). Check recent ones: retry a failed post
+    once (drop it from posted.json so it is created again); if it fails again, record the error so the dashboard shows it."""
+    now_dt = dt.datetime.now(dt.timezone.utc)
+    now, cutoff = (now_dt.strftime("%Y-%m-%dT%H:%M:%S.000Z"), (now_dt - dt.timedelta(days=3)).strftime("%Y-%m-%dT%H:%M:%S.000Z"))
+    changed = False
+    for key, v in list(posted.items()):
+        pid, due = v.get("post_id"), v.get("due_at") or ""
+        if not pid or v.get("via", "buffer") != "buffer" or not due or due > now or due < cutoff or v.get("verified"):
+            continue
+        try:
+            p = gql('query($i:PostId!){ post(input:{id:$i}){ status error { message } } }', {"i": pid})["post"]
+        except Exception as e:
+            print(f"  (could not check Buffer post status for {key}: {str(e)[:200]})"); continue
+        if p.get("status") == "sent":
+            v["verified"] = True; v.pop("error", None); changed = True
+        elif p.get("status") == "error":
+            msg = ((p.get("error") or {}).get("message") or "unknown error").replace("\n", " ")
+            if not v.get("retried"):
+                print(f"::warning title=Buffer failed to publish {key}; sending it once more::{msg[:700]}")
+                RETRY.add(key); del posted[key]; changed = True
+            else:
+                v["error"] = msg[:300]; changed = True
+                print(f"::error title=Buffer failed again for {key}::{msg[:700]} Check the channel; post it by hand if it is not there.")
+    if changed and not os.environ.get("DRY_RUN"):
+        json.dump(posted, open(POSTED, "w"), indent=1)
+
+
 def main():
     posted = json.load(open(POSTED)) if os.path.exists(POSTED) else {}
+    check_buffer_errors(posted)
     rows = list(csv.DictReader(open(SCHEDULE, encoding="utf-8")))
     horizon = (dt.datetime.now(TZ) + dt.timedelta(days=6)).strftime("%Y-%m-%d %H:%M")
     todo = [r for r in rows if f"{r['episode']}:{r['platform'].lower()}" not in posted and r.get("file")
@@ -150,7 +182,7 @@ def main():
             if "message" in res and "post" not in res: raise RuntimeError(res["message"])
             post = res["post"]
             posted[key] = {"post_id": post["id"], "due_at": post.get("dueAt"), "url": urls[path],
-                           "at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")}
+                           "at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), **({"retried": True} if key in RETRY else {})}
             print(f"  ok post {post['id']} due {post.get('dueAt')}")
             json.dump(posted, open(POSTED, "w"), indent=1)
             time.sleep(3)
