@@ -153,13 +153,13 @@ def main():
             json.dump(posted, open(POSTED, "w"), indent=1)
             time.sleep(3)
         except RateLimited as e:
-            print(f"  {e}"); break
+            print(f"  {e}"); print("::warning title=Buffer rate limit::" + str(e)); break
         except Exception as e:
             msg = str(e)
             if re.search(r"limit|queue is full|upgrade|plan", msg, re.I):
                 deferred += 1; print(f"  DEFERRED (Buffer plan limit, retried on the next run): {msg[:160]}")
             else:
-                failures += 1; print(f"  FAILED: {msg}")
+                failures += 1; print(f"  FAILED: {msg}"); print("::error title=Buffer publish failed (ep " + str(r["episode"]) + " " + r["platform"] + ")::" + msg.replace("\n", " ")[:900])
     json.dump(posted, open(POSTED, "w"), indent=1)
     print(f"done: {len(posted)} recorded, {deferred} deferred, {failures} failed")
     if failures: sys.exit(f"{failures} row(s) failed; the rest are recorded in posted.json")
