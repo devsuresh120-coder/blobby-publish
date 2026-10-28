@@ -201,61 +201,71 @@
   "post_id": "6ad848fadb7d8198214758ac",
   "due_at": "2026-10-25T17:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep36_v2.mp4",
-  "at": "2026-10-21T05:09:15+00:00"
+  "at": "2026-10-21T05:09:15+00:00",
+  "verified": true
  },
  "36:facebook": {
   "post_id": "6ad848ffa9967de049765fc2",
   "due_at": "2026-10-25T18:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep36_v2.mp4",
-  "at": "2026-10-21T05:09:19+00:00"
+  "at": "2026-10-21T05:09:19+00:00",
+  "verified": true
  },
  "37:youtube": {
   "post_id": "6ad99b1adeacf5d2532e9e8f",
   "due_at": "2026-10-26T07:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep37_v2.mp4",
-  "at": "2026-10-22T05:11:54+00:00"
+  "at": "2026-10-22T05:11:54+00:00",
+  "verified": true
  },
  "37:facebook": {
   "post_id": "6ad99b1eb086d40f5734764c",
   "due_at": "2026-10-26T07:30:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep37_v2.mp4",
-  "at": "2026-10-22T05:11:59+00:00"
+  "at": "2026-10-22T05:11:59+00:00",
+  "verified": true
  },
  "38:youtube": {
   "post_id": "6ad99b23ecaa6cda042a7a4b",
   "due_at": "2026-10-26T17:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep38_v2.mp4",
-  "at": "2026-10-22T05:12:04+00:00"
+  "at": "2026-10-22T05:12:04+00:00",
+  "verified": true
  },
  "38:facebook": {
   "post_id": "6ad99b287dadc432f73e1781",
   "due_at": "2026-10-26T18:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep38_v2.mp4",
-  "at": "2026-10-22T05:12:08+00:00"
+  "at": "2026-10-22T05:12:08+00:00",
+  "verified": true
  },
  "39:youtube": {
   "post_id": "6adaebd48d2197cb2a182d59",
   "due_at": "2026-10-27T07:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep39_v2.mp4",
-  "at": "2026-10-23T05:08:36+00:00"
+  "at": "2026-10-23T05:08:36+00:00",
+  "verified": true
  },
  "39:facebook": {
   "post_id": "6adaebd9535235087b820cee",
   "due_at": "2026-10-27T07:30:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep39_v2.mp4",
-  "at": "2026-10-23T05:08:41+00:00"
+  "at": "2026-10-23T05:08:41+00:00",
+  "verified": true
  },
  "40:youtube": {
   "post_id": "6adaebded447d56a647a4749",
   "due_at": "2026-10-27T17:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep40_v2.mp4",
-  "at": "2026-10-23T05:08:46+00:00"
+  "at": "2026-10-23T05:08:46+00:00",
+  "verified": true
  },
  "40:facebook": {
   "post_id": "6adaebe3d447d56a647a4851",
   "due_at": "2026-10-27T18:00:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep40_v2.mp4",
-  "at": "2026-10-23T05:08:51+00:00"
+  "at": "2026-10-23T05:08:51+00:00",
+  "verified": true
  },
  "15:youtube": {
   "post_id": "6adc3cafbd33ce99c30832c8",
@@ -375,7 +385,8 @@
   "post_id": "6ae185d9204613d2f144139f",
   "due_at": "2026-10-28T07:30:00.000Z",
   "url": "https://pub-cdb3f27ae2aa4e5e8304eae4db499133.r2.dev/blobby/ep41_v2.mp4",
-  "at": "2026-10-28T05:19:21+00:00"
+  "at": "2026-10-28T05:19:21+00:00",
+  "verified": true
  },
  "23:facebook": {
   "post_id": "6ae1ebc5dee6d1a87ac4719c",
