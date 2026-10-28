@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "publish | list-channels | dry-run"
+        description: "publish | list-channels | dry-run | reschedule"
         default: "publish"
 
 concurrency:
@@ -46,7 +46,9 @@ jobs:
           R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
           R2_PREFIX: blobby/
           DRY_RUN: ${{ github.event.inputs.action == 'dry-run' && '1' || '' }}
-        run: python publish/publish.py
+        run: |
+          case "${{ github.event.inputs.action }}" in reschedule|dry-run) python publish/reschedule.py;; esac
+          python publish/publish.py
 
       - name: Save posted.json
         if: always() && github.event.inputs.action != 'list-channels'
