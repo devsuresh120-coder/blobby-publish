@@ -159,7 +159,7 @@ def main():
         except Exception as e:
             msg = str(e)
             if re.search(r"limit|queue is full|upgrade|plan", msg, re.I):
-                deferred += 1; print(f"  DEFERRED (Buffer plan limit, retried on the next run): {msg[:160]}")
+                deferred += 1; print(f"  DEFERRED (Buffer plan limit, retried on the next run): {msg[:160]}"); print("::warning title=Buffer queue full (ep " + str(r["episode"]) + " " + r["platform"] + ")::" + msg.replace("\n", " ")[:600])
             else:
                 failures += 1; print(f"  FAILED: {msg}"); print("::error title=Buffer publish failed (ep " + str(r["episode"]) + " " + r["platform"] + ")::" + msg.replace("\n", " ")[:900])
     json.dump(posted, open(POSTED, "w"), indent=1)
