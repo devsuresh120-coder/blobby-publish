@@ -126,6 +126,8 @@ def main():
     horizon = (dt.datetime.now(TZ) + dt.timedelta(days=6)).strftime("%Y-%m-%d %H:%M")
     todo = [r for r in rows if f"{r['episode']}:{r['platform'].lower()}" not in posted and r.get("file")
             and (not r.get("due_at", "").strip() or r["due_at"].strip() <= horizon)]
+    # earliest first: Buffer's free plan holds only 10 queued posts per channel, so what is due soonest must get the free slots
+    todo.sort(key=lambda r: (r.get("due_at", "").strip() or "9999", int(r["episode"])))
     print(f"{len(rows)} rows, {len(todo)} due within 6 days and not yet posted")
     if not todo: return
     chans = {} if DRY else channels()
