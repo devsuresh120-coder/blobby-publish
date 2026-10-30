@@ -25,10 +25,17 @@ EP{n:02d} = dict(
              chars=dict(blobby=dict(at=(540, 1120), eyes="open", mouth="flat", tween=False)),
              sfx=[("whoosh", 0.9)]),
     ],
+    # FACEBOOK CUT (epNN_fb.mp4, ~15.8 s): 1-2 extra build-up beats (~3.3 s) inserted BEFORE original beat index 2.
+    # "One more try before the fail". No vox here, one sfx each. Render with: python3 epSTART_END.py --fb
+    fb_extra={{2: [
+        dict(dur=1.7, stage=dict(), caption="TODO try again",
+             chars=dict(blobby=dict(at=(540, 1120), eyes="wide", mouth="grin", fx="sweat")),
+             sfx=[("boing", 0.0)]),
+    ]}},
 )
 '''
-head = f'"""Blobby & Co. — episodes {start}-{end} (theme: {theme})\nRun: python3 ep{start:02d}_{end:02d}.py [num ...]\n"""\nimport sys\nfrom engine import render\n'
+head = f'"""Blobby & Co. — episodes {start}-{end} (theme: {theme})\nRun: python3 ep{start:02d}_{end:02d}.py [num ...]\n"""\nimport sys\nfrom engine import render, render_fb\n'
 body = "".join(TEMPLATE.format(n=n) for n in range(start, end+1))
-tail = f"\nEPISODES = [{', '.join(f'EP{n:02d}' for n in range(start, end+1))}]\nif __name__ == '__main__':\n    only = [int(a) for a in sys.argv[1:]]\n    for ep in EPISODES:\n        if not only or ep['num'] in only:\n            render(ep)\n"
+tail = f"\nEPISODES = [{', '.join(f'EP{n:02d}' for n in range(start, end+1))}]\nif __name__ == '__main__':\n    fb = '--fb' in sys.argv\n    only = [int(a) for a in sys.argv[1:] if a != '--fb']\n    for ep in EPISODES:\n        if not only or ep['num'] in only:\n            render_fb(ep) if fb else render(ep)\n"
 path = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"ep{start:02d}_{end:02d}.py")
 open(path, "w").write(head + body + tail); print("wrote", path)

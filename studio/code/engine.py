@@ -237,7 +237,7 @@ def endcard(base, ep, t):
     d.text((W//2-190, 1700), "BLOBBY & CO.", font=font(54), fill=(255, 204, 60), stroke_width=6, stroke_fill=OUTL)
     return img
 
-def render(ep, out_dir=EPISODES, endcard_dur=3.0, keep_frames=False):
+def render(ep, out_dir=EPISODES, endcard_dur=3.0, keep_frames=False, suffix=""):
     os.makedirs(out_dir, exist_ok=True)
     beats = ep["beats"]; times, total = _beat_times(beats)
     loop = ep.get("loop", False)
@@ -275,15 +275,59 @@ def render(ep, out_dir=EPISODES, endcard_dur=3.0, keep_frames=False):
         if v is not None:
             s = int((total+0.25)*sfxlib.SR); e_ = min(len(mx.mix), s+len(v)); mx.mix[s:e_] += v[:e_-s]
     wav = os.path.join(tmp, "sfx.wav"); mx.save(wav)
-    mp4 = os.path.join(out_dir, f"ep{ep['num']:02d}.mp4")
+    mp4 = os.path.join(out_dir, f"ep{ep['num']:02d}{suffix}.mp4")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", os.path.join(tmp, "f%05d.png"), "-i", wav,
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-c:a", "aac", "-b:a", "160k", "-shortest", mp4], check=True)
     # cover + QA strip
     cf = int(ep.get("cover", 1.0)*FPS)
-    Image.open(os.path.join(tmp, f"f{min(cf, n-1):05d}.png")).save(os.path.join(out_dir, f"ep{ep['num']:02d}_cover.jpg"), quality=92)
+    Image.open(os.path.join(tmp, f"f{min(cf, n-1):05d}.png")).save(os.path.join(out_dir, f"ep{ep['num']:02d}{suffix}_cover.jpg"), quality=92)
     sheet = Image.new("RGB", (270*len(strip), 480))
     for k, im in enumerate(strip): sheet.paste(im, (270*k, 0))
-    sheet.save(os.path.join(out_dir, f"ep{ep['num']:02d}_strip.png"))
+    sheet.save(os.path.join(out_dir, f"ep{ep['num']:02d}{suffix}_strip.png"))
     if not keep_frames: shutil.rmtree(tmp, ignore_errors=True)
-    print(f"ep{ep['num']:02d}: {dur:.1f}s -> {mp4}")
+    print(f"ep{ep['num']:02d}{suffix}: {dur:.1f}s -> {mp4}")
     return mp4
+
+
+# ---- Facebook cut (15-30 s; FB favours longer Reels) ----
+FB_MIN, FB_TARGET = 15.0, 15.8
+
+def stretch(beats, target):
+    """Stretch the longer beats (> 0.6 s) so the beats sum to `target`. Quick hits stay quick. Never shrinks."""
+    long_ = [b for b in beats if b["dur"] > 0.6]; fixed = sum(b["dur"] for b in beats if b["dur"] <= 0.6)
+    k = (target - fixed) / sum(b["dur"] for b in long_)
+    if k > 1:
+        for b in long_: b["dur"] = round(b["dur"]*k, 2)
+
+def facebook_cut(ep):
+    """Episode dict for the Facebook upload (epNN_fb.mp4). Same hook, same punchline, same loop bridge, still no end card.
+    ep["fb_extra"] = {index: [beat, ...]} inserts extra build-up beats BEFORE original beat `index` (rule of three:
+    one more try before the fail). Extra beats carry no vox (the 2-vox limit still holds). Then stretched to >= 15 s.
+    No fb_extra -> fallback: the loop plays twice (~24.6 s), which is what a looping viewer sees anyway."""
+    import copy
+    if sum(b["dur"] for b in ep["beats"]) >= FB_MIN: return None   # already 15 s+ (e.g. mini-story): Facebook uses epNN.mp4
+    fb = copy.deepcopy({k: v for k, v in ep.items() if k != "fb_extra"})
+    extra = ep.get("fb_extra")
+    if extra:
+        # cover: keep it on the same moment of the same original beat
+        times, _ = _beat_times(fb["beats"]); c = fb.get("cover", 1.0)
+        ci = next((i for i, (a, b) in enumerate(times) if c < b), len(times)-1); cf = (c - times[ci][0]) / fb["beats"][ci]["dur"]
+        cover_beat = fb["beats"][ci]
+        beats = []
+        for i, b in enumerate(fb["beats"]):
+            beats += copy.deepcopy(extra.get(i, [])); beats.append(b)
+        stretch(beats, FB_TARGET)
+        times, _ = _beat_times(beats); j = next(i for i, b in enumerate(beats) if b is cover_beat)
+        fb["cover"] = round(times[j][0] + cf*beats[j]["dur"], 2)
+        nvox = sum(len(b.get("vox", [])) for b in beats)
+        assert nvox <= 2, f"ep{ep['num']}: fb cut has {nvox} vox (extra beats must not add vox)"
+    else:
+        beats = fb["beats"] + copy.deepcopy(fb["beats"])
+    fb["beats"] = beats
+    assert sum(b["dur"] for b in beats) >= FB_MIN, ep["num"]
+    return fb
+
+def render_fb(ep, **kw):
+    fb = facebook_cut(ep)
+    if fb is None: print(f"ep{ep['num']:02d}: already 15 s+, no Facebook cut needed"); return None
+    return render(fb, suffix="_fb", **kw)

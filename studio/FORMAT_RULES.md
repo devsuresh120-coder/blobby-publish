@@ -9,3 +9,11 @@ ep1 (13 s, action in frame one) kept 58% of viewers and was watched 111% (replay
 - The viewer question lives only in the description, IG/FB text and pinned comment — never highlighted in the video.
 - `cover` = the second with the biggest reaction face.
 - Reference batch for this format: `code/ep33_42.py`.
+
+## Facebook cut (owner decision 30 Oct 2026: Facebook only) — `epNN_fb.mp4`, ~15.8 s
+Facebook favours 15–30 s Reels. YouTube and TikTok keep the 12–13 s `epNN.mp4`; Facebook gets a longer cut of the same episode.
+- Still NO end card, NO on-screen question, NO voice line. Same frame-one hook, same punchline, same loop bridge.
+- Each loop episode dict gets `fb_extra = {index: [beat, ...]}`: 1–2 extra build-up beats (≈3.3 s) inserted BEFORE original beat `index` — "one more try before the fail" (rule of three). No `vox` in extra beats (2-vox limit still holds), one SFX each, safe-zone rules apply.
+- `engine.facebook_cut(ep)` inserts them, stretches to ~15.8 s and keeps `cover` on the same moment. Episodes already 15 s+ (mini-stories) get no cut. A loop episode without `fb_extra` falls back to playing the loop twice (~25 s).
+- Render: `python3 epSTART_END.py --fb [nums]` (reference: `FB_EXTRA` in `code/ep33_42.py`). Punchline lands ~9–11 s in this cut.
+- Copy `epNN_fb.mp4` to `videos/` with `epNN.mp4`; `publish/kit_to_schedule.py` then uses it for the Facebook row automatically.
