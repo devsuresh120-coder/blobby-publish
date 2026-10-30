@@ -12,7 +12,7 @@ Kit format (one block per episode, as produced by the project):
   **TikTok:** ...
   **IG/FB:** ... (+ base hashtags #a #b)
   **Pinned comment:** ...
-Videos are expected at videos/epNN.mp4.
+Videos are expected at videos/epNN.mp4. Facebook uses the longer cut videos/epNN_fb.mp4 (15-30 s) when it exists.
 """
 import re, csv, argparse, os
 
@@ -52,7 +52,10 @@ def rows_for(n, d, skip, due=None):
         out.append(dict(episode=n, file=f"videos/ep{n:02d}.mp4", platform="tiktok", due_at="",
                         title="", text=d["tiktok"], comment=""))
     if f"{n}:facebook" not in skip:
-        out.append(dict(episode=n, file=f"videos/ep{n:02d}.mp4", platform="facebook", due_at="",
+        fb_file = f"videos/ep{n:02d}_fb.mp4"   # Facebook favours 15-30 s: use the longer cut when the batch made one
+        if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), fb_file)):
+            fb_file = f"videos/ep{n:02d}.mp4"
+        out.append(dict(episode=n, file=fb_file, platform="facebook", due_at="",
                         title="", text=d["fb"], comment=d["comment"]))
     if due:
         for r in out: r["due_at"] = f"{due[0]} {SLOTS[r['platform']][due[1]]}"
