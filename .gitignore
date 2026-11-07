@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+secrets.env
+studio/voices/*.onnx
+studio/voices/*.json
+studio/episodes/
+studio/voices/*.wav
+studio/voices/MODEL_CARD
+studio/voices/*.tar.gz
